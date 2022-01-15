@@ -21,6 +21,20 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card-body">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="filter_company">Filter Companies</label>
+                                            <select class="form-control" data-style="btn btn-link" id="filter_company" name="filter_company">
+                                                <option value="" selected disabled>Select Company</option>
+                                                @foreach($companies as $company)
+                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <table id="employees-table" class="table table-bordered yajra-datatable">
                                     <thead>
                                     <tr>
@@ -118,7 +132,7 @@
                     </button>
                 </div>
 
-                <form id="editEmployeeForm" enctype='multipart/form-data'>
+                <form action="" id="editEmployeeForm" role="form" enctype='multipart/form-data'>
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="modal-body">
@@ -175,7 +189,12 @@
             let table = $('#employees-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('employee.list') }}",
+                ajax: {
+                    url: "{{ route('employee.list') }}",
+                    data: function (d) {
+                        d.company = $('#filter_company').val();
+                    }
+                },
                 columns: [
                     {data: 'id', name: 'id'},
                     {data: 'name', name: 'name'},
@@ -185,6 +204,14 @@
                     {data: 'action', name: 'action'}
                 ]
             });
+
+
+            $('#name, #password, #confirmPassword, #email, #company').attr('required', true);
+            $('#editName, #editPassword, #editConfirmPassword, #editEmail, #editCompany').attr('required', true);
+
+            $(document).on("change", "#filter_company", function () {
+                table.draw();
+            })
 
             $('#addEmployeeForm').on('submit', function (e){
                 e.preventDefault();

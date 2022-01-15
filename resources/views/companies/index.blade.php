@@ -146,6 +146,9 @@
                 ]
             });
 
+            $('#name, #address').attr('required', true);
+            $('#editName, #editAddress').attr('required', true);
+
             $('#addCompanyForm').on('submit', function (e) {
                 e.preventDefault();
                 let formData = new FormData(this);

@@ -10,6 +10,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use DataTables;
+use Illuminate\Support\Str;
+
 class EmployeeController extends Controller
 {
     /**
@@ -29,6 +31,13 @@ class EmployeeController extends Controller
             $data = Employee::latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->filter(function ($instance) use ($request) {
+                    if ($request->has('company') && $request->company) {
+                        $instance->collection = $instance->collection->filter(function ($row) use ($request) {
+                            return Str::contains($row['company_id'], $request->get('company'));
+                        });
+                    }
+                })
                 ->addColumn('company', function ($row){
                     return $row->company->name;
                 })
